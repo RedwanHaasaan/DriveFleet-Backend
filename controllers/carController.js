@@ -1,5 +1,5 @@
 const { getDB } = require("../config/db");
-
+const { ObjectId } = require("mongodb");
 const getCars = async (req, res) => {
   try {
     const db = getDB();
@@ -146,7 +146,37 @@ const addCar = async (req, res) => {
   }
 };
 
+const getCarById = async (req, res) => {
+  try {
+    const db = getDB();
+    const { id } = req.params;
+
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).send({
+        message: "Invalid car ID format",
+      });
+    }
+
+    const car = await db.collection("cars").findOne({ _id: new ObjectId(id) });
+
+    if (!car) {
+      return res.status(404).send({
+        message: "Car not found",
+      });
+    }
+
+    res.send(car);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: "Failed to fetch car details",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getCars,
   addCar,
+  getCarById,
 };

@@ -10,6 +10,7 @@ dotenv.config();
 const { connectDB, getDB } = require("./config/db");
 const recentCarRoutes = require("./routers/recentCarRoutes");
 const carRoutes = require("./routers/carRoutes");
+const bookingRoutes = require("./routers/bookingRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -24,6 +25,7 @@ app.use(express.json());
 
 app.use("/api/v1/recentcar", recentCarRoutes);
 app.use("/api/v1/car", carRoutes);
+app.use("/api/v1/booking", bookingRoutes);
 
 async function startServer() {
   try {
