@@ -6,14 +6,16 @@ const {
   updateCar,
   deleteCar,
 } = require("../controllers/carController");
+const authenticate = require("../middleware/authMiddleware");
 
 const router = require("express").Router();
 
 router.get("/", getCars);
-router.post("/add-car", addCar);
-router.get("/my-cars", getMyCars);
+router.get("/my-cars", authenticate, getMyCars);
 router.get("/:id", getCarById);
-router.put("/:id", updateCar);
-router.delete("/:id", deleteCar);
+
+router.post("/add-car", authenticate, addCar);
+router.put("/:id", authenticate, updateCar);
+router.delete("/:id", authenticate, deleteCar);
 
 module.exports = router;

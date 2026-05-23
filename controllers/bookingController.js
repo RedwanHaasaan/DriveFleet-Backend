@@ -4,7 +4,10 @@ const { ObjectId } = require("mongodb");
 const createBooking = async (req, res) => {
   try {
     const db = getDB();
-    const { carId, startDate, endDate, userId, userName, userEmail } = req.body;
+    const { carId, startDate, endDate } = req.body;
+    const userId = req.user.id;
+    const userName = req.user.name;
+    const userEmail = req.user.email;
 
     if (!carId || !startDate || !endDate) {
       return res.status(400).send({
@@ -44,9 +47,9 @@ const createBooking = async (req, res) => {
       totalPrice,
       startDate: start,
       endDate: end,
-      userId: userId || "anonymous",
+      userId,
       userName: userName || "Anonymous Renter",
-      userEmail: userEmail || "anonymous@example.com",
+      userEmail,
       status: "Confirmed",
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -80,13 +83,7 @@ const createBooking = async (req, res) => {
 const getMyBookings = async (req, res) => {
   try {
     const db = getDB();
-    const { userId } = req.query;
-
-    if (!userId) {
-      return res.status(400).send({
-        message: "Missing required parameter: userId",
-      });
-    }
+    const userId = req.user.id;
 
     const bookings = await db
       .collection("bookings")
@@ -122,11 +119,16 @@ const updateBooking = async (req, res) => {
       });
     }
 
-    // Verify booking exists
     const booking = await db.collection("bookings").findOne({ _id: new ObjectId(id) });
     if (!booking) {
       return res.status(404).send({
         message: "Booking not found",
+      });
+    }
+
+    if (booking.userId !== req.user.id) {
+      return res.status(403).send({
+        message: "You are not allowed to update this booking",
       });
     }
 
@@ -180,11 +182,16 @@ const deleteBooking = async (req, res) => {
       });
     }
 
-    // Verify booking exists
     const booking = await db.collection("bookings").findOne({ _id: new ObjectId(id) });
     if (!booking) {
       return res.status(404).send({
         message: "Booking not found",
+      });
+    }
+
+    if (booking.userId !== req.user.id) {
+      return res.status(403).send({
+        message: "You are not allowed to cancel this booking",
       });
     }
 

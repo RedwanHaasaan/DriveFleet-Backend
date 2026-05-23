@@ -5,9 +5,11 @@ dns.setServers([
 ]);
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 dotenv.config();
 const { connectDB, getDB } = require("./config/db");
+const authRoutes = require("./routers/authRoutes");
 const recentCarRoutes = require("./routers/recentCarRoutes");
 const carRoutes = require("./routers/carRoutes");
 const bookingRoutes = require("./routers/bookingRoutes");
@@ -22,7 +24,9 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(cookieParser());
 
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/recentcar", recentCarRoutes);
 app.use("/api/v1/car", carRoutes);
 app.use("/api/v1/booking", bookingRoutes);

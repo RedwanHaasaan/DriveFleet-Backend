@@ -93,10 +93,11 @@ const addCar = async (req, res) => {
       image,
       description,
       availability,
-      userId,
-      userName,
-      userEmail,
     } = req.body;
+
+    const userId = req.user.id;
+    const userName = req.user.name;
+    const userEmail = req.user.email;
 
     // Validation
     if (
@@ -127,9 +128,9 @@ const addCar = async (req, res) => {
       image: image || null,
       description: description || "",
       availability: availability !== false,
-      userId: userId || null,
+      userId,
       userName: userName || "Anonymous",
-      userEmail: userEmail || null,
+      userEmail,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -184,13 +185,7 @@ const getCarById = async (req, res) => {
 const getMyCars = async (req, res) => {
   try {
     const db = getDB();
-    const { userId } = req.query;
-
-    if (!userId) {
-      return res.status(400).send({
-        message: "Missing required parameter: userId",
-      });
-    }
+    const userId = req.user.id;
 
     const cars = await db
       .collection("cars")
@@ -229,6 +224,20 @@ const updateCar = async (req, res) => {
     if (!ObjectId.isValid(id)) {
       return res.status(400).send({
         message: "Invalid car ID format",
+      });
+    }
+
+    const existingCar = await db.collection("cars").findOne({ _id: new ObjectId(id) });
+
+    if (!existingCar) {
+      return res.status(404).send({
+        message: "Car not found",
+      });
+    }
+
+    if (existingCar.userId !== req.user.id) {
+      return res.status(403).send({
+        message: "You are not allowed to update this car",
       });
     }
 
@@ -281,13 +290,21 @@ const deleteCar = async (req, res) => {
       });
     }
 
-    const result = await db.collection("cars").deleteOne({ _id: new ObjectId(id) });
+    const existingCar = await db.collection("cars").findOne({ _id: new ObjectId(id) });
 
-    if (result.deletedCount === 0) {
+    if (!existingCar) {
       return res.status(404).send({
         message: "Car not found",
       });
     }
+
+    if (existingCar.userId !== req.user.id) {
+      return res.status(403).send({
+        message: "You are not allowed to delete this car",
+      });
+    }
+
+    await db.collection("cars").deleteOne({ _id: new ObjectId(id) });
 
     res.send({
       message: "Car deleted successfully",
