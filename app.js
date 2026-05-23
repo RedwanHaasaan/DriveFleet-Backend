@@ -23,7 +23,7 @@ app.use(cors({
 app.use(express.json());
 
 app.use("/api/v1/recentcar", recentCarRoutes);
-app.use("/api/v1/getcar", carRoutes);
+app.use("/api/v1/car", carRoutes);
 
 async function startServer() {
   try {

@@ -77,6 +77,76 @@ const getCars = async (req, res) => {
   }
 };
 
+const addCar = async (req, res) => {
+  try {
+    const db = getDB();
+
+    const {
+      brand,
+      model,
+      year,
+      location,
+      dailyRentalPrice,
+      transmission,
+      fuelType,
+      seats,
+      image,
+      description,
+      availability,
+    } = req.body;
+
+    // Validation
+    if (
+      !brand ||
+      !model ||
+      !year ||
+      !location ||
+      !dailyRentalPrice ||
+      !transmission ||
+      !fuelType ||
+      !seats
+    ) {
+      return res.status(400).send({
+        message: "Missing required fields: brand, model, year, location, dailyRentalPrice, transmission, fuelType, seats",
+      });
+    }
+
+    // Create car object
+    const newCar = {
+      brand,
+      model,
+      year: Number(year),
+      location,
+      dailyRentalPrice: Number(dailyRentalPrice),
+      transmission,
+      fuelType,
+      seats: Number(seats),
+      image: image || null,
+      description: description || "",
+      availability: availability !== false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    // Insert into database
+    const result = await db.collection("cars").insertOne(newCar);
+
+    res.status(201).send({
+      message: "Car added successfully",
+      carId: result.insertedId,
+      car: newCar,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).send({
+      message: "Failed to add car",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getCars,
+  addCar,
 };
