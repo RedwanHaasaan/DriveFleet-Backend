@@ -93,6 +93,9 @@ const addCar = async (req, res) => {
       image,
       description,
       availability,
+      userId,
+      userName,
+      userEmail,
     } = req.body;
 
     // Validation
@@ -124,6 +127,9 @@ const addCar = async (req, res) => {
       image: image || null,
       description: description || "",
       availability: availability !== false,
+      userId: userId || null,
+      userName: userName || "Anonymous",
+      userEmail: userEmail || null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
