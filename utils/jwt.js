@@ -25,7 +25,7 @@ const isSecureContext = process.env.SECURE_COOKIES === "true" || isProduction;
 const cookieOptions = {
   httpOnly: true,
   secure: isSecureContext, // Only set to true if SECURE_COOKIES=true or NODE_ENV=production
-  sameSite: isProduction ? "strict" : "lax",
+  sameSite: isProduction ? "none" : "lax",
   maxAge: TOKEN_MAX_AGE_MS,
   path: "/",
 };

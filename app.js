@@ -18,11 +18,12 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Get frontend URL from environment or use default
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+const rawFrontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+const FRONTEND_URL = rawFrontendUrl.replace(/\/$/, "");
 
 // CORS Configuration - Allow credentials from frontend
 app.use(cors({
-  origin: FRONTEND_URL,
+  origin: [FRONTEND_URL, "http://localhost:3000"],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
