@@ -17,10 +17,15 @@ const bookingRoutes = require("./routers/bookingRoutes");
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// CORS Configuration
+// Get frontend URL from environment or use default
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+
+// CORS Configuration - Allow credentials from frontend
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  origin: FRONTEND_URL,
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
 app.use(express.json());
@@ -34,6 +39,7 @@ app.use("/api/v1/booking", bookingRoutes);
 async function startServer() {
   try {
     await connectDB();
+    console.log(`CORS configured for: ${FRONTEND_URL}`);
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });

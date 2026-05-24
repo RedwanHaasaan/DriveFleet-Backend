@@ -18,10 +18,14 @@ function verifyToken(token) {
   return jwt.verify(token, getJwtSecret());
 }
 
+// Determine if we're in a secure context
+const isProduction = process.env.NODE_ENV === "production";
+const isSecureContext = process.env.SECURE_COOKIES === "true" || isProduction;
+
 const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax",
+  secure: isSecureContext, // Only set to true if SECURE_COOKIES=true or NODE_ENV=production
+  sameSite: isProduction ? "strict" : "lax",
   maxAge: TOKEN_MAX_AGE_MS,
   path: "/",
 };

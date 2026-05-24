@@ -4,6 +4,7 @@ function authenticate(req, res, next) {
   const token = req.cookies?.token;
 
   if (!token) {
+    console.warn("⚠️  No token found in cookies. Available cookies:", Object.keys(req.cookies || {}));
     return res.status(401).json({
       message: "Authentication required",
     });
@@ -16,8 +17,10 @@ function authenticate(req, res, next) {
       email: decoded.email,
       name: decoded.name,
     };
+    console.log("✅ User authenticated:", decoded.email);
     next();
   } catch (error) {
+    console.error("❌ Token verification failed:", error.message);
     res.clearCookie("token", cookieOptions);
 
     if (error.name === "TokenExpiredError") {
